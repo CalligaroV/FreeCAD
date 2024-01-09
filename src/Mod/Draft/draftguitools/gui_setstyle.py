@@ -104,7 +104,8 @@ class Draft_SetStyle_TaskPanel:
 
         self.form.AnnoLineColor.setProperty("color", self.getColor(params.get_param("DefaultAnnoLineColor")))
         self.form.AnnoLineWidth.setValue(params.get_param("DefaultAnnoLineWidth"))
-        self.form.ArrowStyle.setCurrentIndex(params.get_param("dimsymbol"))
+        self.form.ArrowStyleStart.setCurrentIndex(params.get_param("dimsymbolstart"))
+        self.form.ArrowStyleEnd.setCurrentIndex(params.get_param("dimsymbolend"))
         self.form.ArrowSize.setText(U.Quantity(params.get_param("arrowsize"), U.Length).UserString)
         self.form.ShowUnit.setChecked(params.get_param("showUnit"))
         self.form.UnitOverride.setText(params.get_param("overrideUnit"))
@@ -318,7 +319,8 @@ class Draft_SetStyle_TaskPanel:
 
         params.set_param("DefaultAnnoLineColor", utils.argb_to_rgba(self.form.AnnoLineColor.property("color").rgba()))
         params.set_param("DefaultAnnoLineWidth", self.form.AnnoLineWidth.value())
-        params.set_param("dimsymbol", self.form.ArrowStyle.currentIndex())
+        params.set_param("dimsymbolstart", self.form.ArrowStyleStart.currentIndex())
+        params.set_param("dimsymbolend", self.form.ArrowStyleEnd.currentIndex())
         params.set_param("arrowsize", U.Quantity(self.form.ArrowSize.text()).Value)
         params.set_param("showUnit", self.form.ShowUnit.isChecked())
         params.set_param("overrideUnit", self.form.UnitOverride.text())
@@ -390,8 +392,10 @@ class Draft_SetStyle_TaskPanel:
                 vobj.LineColor = self.form.AnnoLineColor.property("color").getRgbF()[:3]
             if "LineWidth" in properties:
                 vobj.LineWidth = self.form.AnnoLineWidth.value()
-            if "ArrowType" in properties:
-                vobj.ArrowType = utils.ARROW_TYPES[self.form.ArrowStyle.currentIndex()]
+            if "ArrowTypeStart" in properties:
+                vobj.ArrowTypeStart = utils.ARROW_TYPES[self.form.ArrowStyleStart.currentIndex()]
+            if "ArrowTypeEnd" in properties:
+                vobj.ArrowTypeEnd = utils.ARROW_TYPES[self.form.ArrowStyleEnd.currentIndex()]
             if "ArrowSize" in properties:
                 vobj.ArrowSize = U.Quantity(self.form.ArrowSize.text()).Value
             if "ShowUnit" in properties:
