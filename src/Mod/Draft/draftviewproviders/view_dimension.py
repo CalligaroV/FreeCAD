@@ -732,7 +732,7 @@ class ViewProviderLinearDimension(ViewProviderDimensionBase):
 
     def draw_dim_arrows(self, vobj):
         """Draw dimension arrows."""
-        if not (hasattr(vobj, "ArrowTypeStart") or hasattr(vobj, "ArrowTypeEnd")):
+        if not (hasattr(vobj, "ArrowTypeStart") and hasattr(vobj, "ArrowTypeEnd")):
             return
 
         if self.p3.x < self.p2.x:
@@ -740,8 +740,11 @@ class ViewProviderLinearDimension(ViewProviderDimensionBase):
         else:
             inv = True
 
-        # Set scale
-        startSymbol = utils.ARROW_TYPES.index(vobj.ArrowTypeStart)
+    # Set scale
+        startSymbol = utils.ARROW_TYPES.index("None")
+        if vobj.Object.Diameter or not self.is_linked_to_circle():
+            startSymbol = utils.ARROW_TYPES.index(vobj.ArrowTypeStart)
+
         endSymbol = utils.ARROW_TYPES.index(vobj.ArrowTypeEnd)
         s = vobj.ArrowSize.Value * vobj.ScaleMultiplier
         self.trans1.scaleFactor.setValue((s, s, s))
@@ -751,15 +754,14 @@ class ViewProviderLinearDimension(ViewProviderDimensionBase):
         self.marks = coin.SoSeparator()
         self.marks.addChild(self.linecolor)
 
-        if vobj.Object.Diameter or not self.is_linked_to_circle():
-            s1 = coin.SoSeparator()
-            if startSymbol == "Circle":
-                s1.addChild(self.coord1)
-            else:
-                s1.addChild(self.trans1)
+        s1 = coin.SoSeparator()
+        if startSymbol == "Circle":
+            s1.addChild(self.coord1)
+        else:
+            s1.addChild(self.trans1)
 
-            s1.addChild(gui_utils.dim_symbol(startSymbol, invert=not inv))
-            self.marks.addChild(s1)
+        s1.addChild(gui_utils.dim_symbol(startSymbol, invert=not inv))
+        self.marks.addChild(s1)
 
         s2 = coin.SoSeparator()
         if endSymbol == "Circle":
@@ -1181,7 +1183,7 @@ class ViewProviderAngularDimension(ViewProviderDimensionBase):
 
     def draw_dim_arrows(self, vobj):
         """Draw dimension arrows."""
-        if not (hasattr(vobj, "ArrowTypeStart") or hasattr(vobj, "ArrowTypeEnd")):
+        if not (hasattr(vobj, "ArrowTypeStart") and hasattr(vobj, "ArrowTypeEnd")):
             return
 
         # Set scale

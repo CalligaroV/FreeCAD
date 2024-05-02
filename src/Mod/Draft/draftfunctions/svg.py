@@ -345,19 +345,20 @@ def _svg_dimension(obj, plane, scale, linewidth, fontsize,
                                  linewidth, shootangle)
 
         # drawing arrows
-        if (hasattr(vobj, "ArrowTypeStart") or hasattr(vobj, "ArrowTypeEnd")):
+        if (hasattr(vobj, "ArrowTypeStart") and hasattr(vobj, "ArrowTypeEnd")):
             arrowsize = vobj.ArrowSize.Value/pointratio
             if hasattr(vobj, "FlipArrows"):
                 if vobj.FlipArrows:
                     angle = angle + math.pi
 
-            if not hasattr(obj, "Diameter") \
-                    or obj.Diameter \
-                    or not prx.is_linked_to_circle():
-                svg += get_arrow(obj,
-                                 vobj.ArrowTypeStart,
-                                 p2, arrowsize, stroke, linewidth,
-                                 angle)
+            startS = "None"
+            if obj.Diameter or not prx.is_linked_to_circle():
+                startS = vobj.ArrowTypeStart
+
+            svg += get_arrow(obj,
+                             startS,
+                             p2, arrowsize, stroke, linewidth,
+                             angle)
 
             svg += get_arrow(obj,
                              vobj.ArrowTypeEnd,
@@ -545,7 +546,7 @@ def get_svg(obj,
                                             edges=[prx.circle])
 
                     # drawing arrows
-                    if (hasattr(obj.ViewObject, "ArrowTypeStart") or hasattr(obj.ViewObject, "ArrowTypeEnd")):
+                    if (hasattr(obj.ViewObject, "ArrowTypeStart") and hasattr(obj.ViewObject, "ArrowTypeEnd")):
                         p2 = get_proj(prx.p2, plane)
                         p3 = get_proj(prx.p3, plane)
                         arrowsize = obj.ViewObject.ArrowSize.Value/pointratio

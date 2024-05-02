@@ -112,16 +112,6 @@ class ViewProviderLabel(ViewProviderDraftAnnotation):
             vobj.ArrowTypeStart = utils.ARROW_TYPES
             vobj.ArrowTypeStart = utils.ARROW_TYPES[params.get_param("dimsymbolstart")]
 
-        if "ArrowTypeEnd" not in properties:
-            _tip = QT_TRANSLATE_NOOP("App::Property",
-                                     "Arrow type")
-            vobj.addProperty("App::PropertyEnumeration",
-                             "ArrowTypeEnd",
-                             "Graphics",
-                             _tip)
-            vobj.ArrowTypeEnd = utils.ARROW_TYPES
-            vobj.ArrowTypeEnd = utils.ARROW_TYPES[params.get_param("dimsymbolend")]
-
         if "Frame" not in properties:
             _tip = QT_TRANSLATE_NOOP("App::Property",
                                      "The type of frame around the text "
@@ -330,10 +320,6 @@ class ViewProviderLabel(ViewProviderDraftAnnotation):
             if len(obj.Points) > 1:
                 self.update_arrow(obj, vobj)
 
-        elif prop == "ArrowTypeEnd" and "ArrowTypeEnd" in properties:
-            if len(obj.Points) > 1:
-                self.update_arrow(obj, vobj)
-
         elif (prop == "ArrowSize"
               and "ArrowSize" in properties
               and "ScaleMultiplier" in properties):
@@ -420,16 +406,9 @@ class ViewProviderLabel(ViewProviderDraftAnnotation):
             if self.arrow.findChild(self.startSymbol) != -1:
                 self.arrow.removeChild(self.startSymbol)
 
-        if hasattr(self, "endSymbol"):
-            if self.arrow.findChild(self.endSymbol) != -1:
-                self.arrow.removeChild(self.endSymbol)
-
         startS = utils.ARROW_TYPES.index(vobj.ArrowTypeStart)
-        endS = utils.ARROW_TYPES.index(vobj.ArrowTypeEnd)
         self.startSymbol = gui_utils.dim_symbol(startS)
-        self.endSymbol = gui_utils.dim_symbol(endS)
         self.arrow.addChild(self.startSymbol)
-        self.arrow.addChild(self.endSymbol)
 
         prec = 10**(-utils.precision())
         x_axis = App.Vector(1,0,0)

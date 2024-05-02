@@ -64,6 +64,10 @@ class DraftAnnotation(object):
         vobj = obj.ViewObject
         if not vobj:
             return
+        vobj.Proxy.set_graphics_properties(vobj, vobj.PropertiesList)
+        if hasattr(vobj, "ArrowType"):
+            _wrn("v1.0, " + obj.Label + ", " + translate("draft", "migrated 'ArrowType' property to 'ArrowTypeStart'"))
+            vobj.ArrowTypeStart = vobj.ArrowType
         if hasattr(vobj, "ScaleMultiplier") and hasattr(vobj, "AnnotationStyle"):
             return
         self.add_missing_properties_0v19(obj, vobj)
