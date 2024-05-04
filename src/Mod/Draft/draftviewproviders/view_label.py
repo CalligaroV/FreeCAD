@@ -93,14 +93,14 @@ class ViewProviderLabel(ViewProviderDraftAnnotation):
         """Set graphics properties only if they don't already exist."""
         super().set_graphics_properties(vobj, properties)
 
-        if "ArrowSize" not in properties:
+        if "ArrowSizeStart" not in properties:
             _tip = QT_TRANSLATE_NOOP("App::Property",
                                      "Arrow size")
             vobj.addProperty("App::PropertyLength",
-                             "ArrowSize",
+                             "ArrowSizeStart",
                              "Graphics",
                              _tip)
-            vobj.ArrowSize = params.get_param("arrowsize")
+            vobj.ArrowSizeStart = params.get_param("arrowsizestart")
 
         if "ArrowTypeStart" not in properties:
             _tip = QT_TRANSLATE_NOOP("App::Property",
@@ -224,7 +224,7 @@ class ViewProviderLabel(ViewProviderDraftAnnotation):
         self.onChanged(vobj, "LineColor")
         self.onChanged(vobj, "TextColor")
         self.onChanged(vobj, "LineWidth")
-        self.onChanged(vobj, "ArrowSize")
+        self.onChanged(vobj, "ArrowSizeStart")
         self.onChanged(vobj, "Line")
 
     def updateData(self, obj, prop):
@@ -277,8 +277,8 @@ class ViewProviderLabel(ViewProviderDraftAnnotation):
                             and "Frame" in properties)
 
         if prop == "ScaleMultiplier" and "ScaleMultiplier" in properties:
-            if "ArrowSize" in properties:
-                s = vobj.ArrowSize.Value * vobj.ScaleMultiplier
+            if "ArrowSizeStart" in properties:
+                s = vobj.ArrowSizeStart.Value * vobj.ScaleMultiplier
                 if s:
                     self.arrowpos.scaleFactor.setValue((s, s, s))
             if can_update_label:
@@ -320,10 +320,10 @@ class ViewProviderLabel(ViewProviderDraftAnnotation):
             if len(obj.Points) > 1:
                 self.update_arrow(obj, vobj)
 
-        elif (prop == "ArrowSize"
-              and "ArrowSize" in properties
+        elif (prop == "ArrowSizeStart"
+              and "ArrowSizeStart" in properties
               and "ScaleMultiplier" in properties):
-            s = vobj.ArrowSize.Value * vobj.ScaleMultiplier
+            s = vobj.ArrowSizeStart.Value * vobj.ScaleMultiplier
             if s:
                 self.arrowpos.scaleFactor.setValue((s, s, s))
 

@@ -345,8 +345,10 @@ def _svg_dimension(obj, plane, scale, linewidth, fontsize,
                                  linewidth, shootangle)
 
         # drawing arrows
-        if (hasattr(vobj, "ArrowTypeStart") and hasattr(vobj, "ArrowTypeEnd")):
-            arrowsize = vobj.ArrowSize.Value/pointratio
+        if (hasattr(vobj, "ArrowTypeStart") and hasattr(vobj, "ArrowTypeEnd") and
+            hasattr(vobj, "ArrowSizeStart") and hasattr(vobj, "ArrowSizeEnd")):
+            arrowsizestart = vobj.ArrowSizeStart.Value/pointratio
+            arrowsizeend = vobj.ArrowSizeEnd.Value/pointratio
             if hasattr(vobj, "FlipArrows"):
                 if vobj.FlipArrows:
                     angle = angle + math.pi
@@ -357,12 +359,12 @@ def _svg_dimension(obj, plane, scale, linewidth, fontsize,
 
             svg += get_arrow(obj,
                              startS,
-                             p2, arrowsize, stroke, linewidth,
+                             p2, arrowsizestart, stroke, linewidth,
                              angle)
 
             svg += get_arrow(obj,
                              vobj.ArrowTypeEnd,
-                             p3, arrowsize, stroke, linewidth,
+                             p3, arrowsizeend, stroke, linewidth,
                              angle + math.pi)
 
     # drawing text
@@ -546,22 +548,27 @@ def get_svg(obj,
                                             edges=[prx.circle])
 
                     # drawing arrows
-                    if (hasattr(obj.ViewObject, "ArrowTypeStart") and hasattr(obj.ViewObject, "ArrowTypeEnd")):
+                    if (hasattr(obj.ViewObject, "ArrowTypeStart") and hasattr(obj.ViewObject, "ArrowTypeEnd") and
+                        hasattr(obj.ViewObject, "ArrowSizeStart") and hasattr(obj.ViewObject, "ArrowSizeEnd")):
                         p2 = get_proj(prx.p2, plane)
                         p3 = get_proj(prx.p3, plane)
-                        arrowsize = obj.ViewObject.ArrowSize.Value/pointratio
-                        halfarrowlength = 2 * arrowsize
-                        arrowangle = 2 * math.asin(halfarrowlength / prx.circle.Curve.Radius)
+                        arrowsizestart = obj.ViewObject.ArrowSizeStart.Value/pointratio
+                        halfstartarrowlength = 2 * arrowsizestart
+                        startarrowangle = 2 * math.asin(halfstartarrowlength / prx.circle.Curve.Radius)
+                        arrowsizeend = obj.ViewObject.ArrowSizeEnd.Value/pointratio
+                        halfendarrowlength = 2 * arrowsizeend
+                        endarrowangle = 2 * math.asin(halfendarrowlength / prx.circle.Curve.Radius)
                         if hasattr(obj.ViewObject, "FlipArrows") \
                                 and obj.ViewObject.FlipArrows:
-                            arrowangle = -arrowangle
+                            startarrowangle = -startarrowangle
+                            endarrowangle = -endarrowangle
 
                         _v1a = prx.circle.valueAt(prx.circle.FirstParameter
-                                                  + arrowangle)
+                                                  + startarrowangle)
                         _v1b = prx.circle.valueAt(prx.circle.FirstParameter)
 
                         _v2a = prx.circle.valueAt(prx.circle.LastParameter
-                                                  - arrowangle)
+                                                  - endarrowangle)
                         _v2b = prx.circle.valueAt(prx.circle.LastParameter)
 
                         u1 = get_proj(_v1a - _v1b, plane)
@@ -571,11 +578,11 @@ def get_svg(obj,
 
                         svg += get_arrow(obj,
                                          obj.ViewObject.ArrowTypeStart,
-                                         p2, arrowsize, stroke, linewidth,
+                                         p2, arrowsizestart, stroke, linewidth,
                                          angle1)
                         svg += get_arrow(obj,
                                          obj.ViewObject.ArrowTypeEnd,
-                                         p3, arrowsize, stroke, linewidth,
+                                         p3, arrowsizeend, stroke, linewidth,
                                          angle2)
 
                     # drawing text
@@ -628,21 +635,23 @@ def get_svg(obj,
             # Draw arrow.
             # We are different here from 3D view
             # if Line is set to 'off', no arrow is drawn
-            if (hasattr(obj.ViewObject, "ArrowTypeStart") or hasattr(obj.ViewObject, "ArrowTypeEnd")) and len(obj.Points) >= 2:
+            if ((hasattr(obj.ViewObject, "ArrowTypeStart") and (hasattr(obj.ViewObject, "ArrowSizeStart"))) or
+                (hasattr(obj.ViewObject, "ArrowTypeEnd") and hasattr(obj.ViewObject, "ArrowSizeEnd")) and
+                len(obj.Points) >= 2):
                 last_segment = App.Vector(obj.Points[-1] - obj.Points[-2])
                 _v = get_proj(last_segment, plane)
                 angle = -DraftVecUtils.angle(_v) + math.pi
-                if hasattr(obj.ViewObject, "ArrowTypeStart"):
+                if (hasattr(obj.ViewObject, "ArrowTypeStart") and hasattr(obj.ViewObject, "ArrowSizeStart")):
                     svg += get_arrow(obj,
                                     obj.ViewObject.ArrowTypeStart,
                                     proj_points[-1],
-                                    obj.ViewObject.ArrowSize.Value/pointratio,
+                                    obj.ViewObject.ArrowSizeStart.Value/pointratio,
                                     stroke, linewidth, angle)
-                if hasattr(obj.ViewObject, "ArrowTypeEnd"):
+                if (hasattr(obj.ViewObject, "ArrowTypeEnd") and hasattr(obj.ViewObject, "ArrowSizeEnd")):
                     svg += get_arrow(obj,
                                     obj.ViewObject.ArrowTypeEnd,
                                     proj_points[-2],
-                                    obj.ViewObject.ArrowSize.Value/pointratio,
+                                    obj.ViewObject.ArrowSizeEnd.Value/pointratio,
                                     stroke, linewidth, angle)
 
         if not App.GuiUp:
@@ -897,20 +906,27 @@ def get_svg(obj,
                 and hasattr(obj.ViewObject, "EndArrow")
                 and obj.ViewObject.EndArrow
                 and (hasattr(obj.ViewObject, "ArrowTypeStart") or hasattr(obj.ViewObject, "ArrowTypeEnd"))
+                and (hasattr(obj.ViewObject, "ArrowSizeStart") or hasattr(obj.ViewObject, "ArrowSizeEnd"))
                 and len(obj.Shape.Vertexes) > 1):
             p1 = get_proj(obj.Shape.Vertexes[-1].Point, plane)
             p2 = get_proj(obj.Shape.Vertexes[-2].Point, plane)
             angle = -DraftVecUtils.angle(p2 - p1)
 
-            arrowsize = obj.ViewObject.ArrowSize.Value/pointratio
+            if hasattr(obj.ViewObject, "ArrowSizeStart"):
+                arrowsizestart = obj.ViewObject.ArrowSizeStart.Value/pointratio
+
             if hasattr(obj.ViewObject, "ArrowTypeStart"):
                 svg += get_arrow(obj,
                                 obj.ViewObject.ArrowTypeStart,
-                                p1, arrowsize, stroke, linewidth, angle)
+                                p1, arrowsizestart, stroke, linewidth, angle)
+
+            if hasattr(obj.ViewObject, "ArrowSizeEnd"):
+                arrowsizeend = obj.ViewObject.ArrowSizeEnd.Value/pointratio
+
             if hasattr(obj.ViewObject, "ArrowTypeEnd"):
                 svg += get_arrow(obj,
                                 obj.ViewObject.ArrowTypeEnd,
-                                p2, arrowsize, stroke, linewidth, angle)
+                                p2, arrowsizeend, stroke, linewidth, angle)
 
     # techdraw expects bottom-to-top coordinates
     if techdraw:

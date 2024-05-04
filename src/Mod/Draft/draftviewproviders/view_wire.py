@@ -67,13 +67,21 @@ class ViewProviderWire(ViewProviderDraft):
                              QT_TRANSLATE_NOOP("App::Property", _tip))
             vobj.EndArrow = False
 
-        if not hasattr(vobj, "ArrowSize"):
+        if not hasattr(vobj, "ArrowSizeStart"):
             _tip = "Arrow size"
             vobj.addProperty("App::PropertyLength",
-                             "ArrowSize",
+                             "ArrowSizeStart",
                              "Draft",
                              QT_TRANSLATE_NOOP("App::Property", _tip))
-            vobj.ArrowSize = params.get_param("arrowsize")
+            vobj.ArrowSizeStart = params.get_param("arrowsizestart")
+
+        if not hasattr(vobj, "ArrowSizeEnd"):
+            _tip = "Arrow size"
+            vobj.addProperty("App::PropertyLength",
+                             "ArrowSizeEnd",
+                             "Draft",
+                             QT_TRANSLATE_NOOP("App::Property", _tip))
+            vobj.ArrowSizeEnd = params.get_param("arrowsizeend")
 
         if not hasattr(vobj, "ArrowTypeStart"):
             _tip = "Arrow type"
@@ -124,7 +132,7 @@ class ViewProviderWire(ViewProviderDraft):
         return
 
     def onChanged(self, vobj, prop):
-        if prop in ["EndArrow","ArrowSize","ArrowTypeStart","ArrowTypeEnd","Visibility"]:
+        if prop in ["EndArrow","ArrowSizeStart","ArrowTypeStart","ArrowTypeEnd","Visibility"]:
             rn = vobj.RootNode
             if hasattr(self,"pt") and hasattr(vobj,"EndArrow"):
                 if vobj.EndArrow and vobj.Visibility:
@@ -137,10 +145,10 @@ class ViewProviderWire(ViewProviderDraft):
                     self.pt.addChild(self.startSymbol)
                     self.pt.addChild(self.endSymbol)
                     self.updateData(vobj.Object,"Points")
-                    if hasattr(vobj,"ArrowSize"):
-                        s = vobj.ArrowSize
+                    if hasattr(vobj,"ArrowSizeStart"):
+                        s = vobj.ArrowSizeStart
                     else:
-                        s = params.get_param("arrowsize")
+                        s = params.get_param("arrowsizestart")
                     self.coords.scaleFactor.setValue((s,s,s))
                     rn.addChild(self.pt)
                 else:

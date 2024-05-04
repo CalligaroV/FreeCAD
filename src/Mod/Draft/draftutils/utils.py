@@ -64,7 +64,8 @@ def get_default_annotation_style():
     arrow_start_type_index = params.get_param("dimsymbolstart")
     arrow_end_type_index = params.get_param("dimsymbolend")
     return {
-        "ArrowSize":       ("float", params.get_param("arrowsize")),
+        "ArrowSizeStart":  ("float", params.get_param("arrowsizestart")),
+        "ArrowSizeEnd":    ("float", params.get_param("arrowsizeend")),
         "ArrowTypeStart":  ("index", arrow_start_type_index, ARROW_TYPES[arrow_start_type_index]),
         "ArrowTypeEnd":    ("index", arrow_end_type_index, ARROW_TYPES[arrow_end_type_index]),
         "Decimals":        ("int",   params.get_param("dimPrecision")),
@@ -211,7 +212,7 @@ def get_param_type(param):
                    "FontFile", "ClonePrefix", "overrideUnit",
                    "labeltype", "gridSpacing") or "inCommandShortcut" in param:
         return "string"
-    elif param in ("textheight", "arrowsize", "extlines", "dimspacing",
+    elif param in ("textheight", "arrowsizestart", "arrowsizeend", "extlines", "dimspacing",
                    "dimovershoot", "extovershoot", "HatchPatternSize",
                    "LineSpacing", "DefaultAnnoScaleMultiplier"):
         return "float"
