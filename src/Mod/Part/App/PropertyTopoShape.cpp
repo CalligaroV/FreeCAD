@@ -587,11 +587,17 @@ void PropertyPartShape::SaveDocFile (Base::Writer &writer) const
 
 void PropertyPartShape::RestoreDocFile(Base::Reader &reader)
 {
+
+    // save the element map
+    auto elementMap = _Shape.resetElementMap();
+    auto hasher = _Shape.Hasher;
+
     Base::FileInfo brep(reader.getFileName());
+    TopoShape shape;
+    std::string ver = _Ver;
+
     if (brep.hasExtension("bin")) {
-        TopoShape shape;
         shape.importBinary(reader);
-        setValue(shape);
     }
     else {
         bool direct = App::GetApplication().GetParameterGroupByPath
@@ -604,7 +610,13 @@ void PropertyPartShape::RestoreDocFile(Base::Reader &reader)
             loadFromStream(reader);
             reader.exceptions(iostate);
         }
+        shape = getValue();
     }
+
+    shape.Hasher = hasher;
+    shape.resetElementMap(elementMap);
+    setValue(shape);
+    _Ver = ver;
 }
 
 // -------------------------------------------------------------------------
